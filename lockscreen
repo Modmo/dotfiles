@@ -1,0 +1,1 @@
+ffmpeg -loglevel panic -f x11grab -framerate 1 -video_size 6200x1920 -y -i :0 -filter_complex "boxblur=15" -vframes 1 /tmp/lockscreen.png; i3lock -i /tmp/lockscreen.png; sleep 10; xset dpms force off 

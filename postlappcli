@@ -1,0 +1,83 @@
+#!/bin/bash
+
+#### Henter variables for imagemagick bildet
+read -p "Navn på skole: " skolenavn
+read -p "Adresse til skole: " adresse
+
+#### Henter variable og tester om Poststed er riktig format.
+while read -p "Poststed (feks 1234 OSLO): " poststed
+	do  posttest=$(grep -P -o '\A\d{4} \S{3,}' <<<$poststed)
+		if [[ -z "$posttest"  ]]
+		then
+			echo "Poststed format er feil!"
+		else
+			break
+		fi
+done
+
+#### legger til next line slik at imagemagick deler opp output
+skolenavn+=" \n "
+adresse+=" \n "
+
+#### Progressbar
+echo -ne "|          |  0% \r"
+sleep 0.1
+
+echo -ne "|#         | 10% \r"
+sleep 0.1
+
+echo -ne "|##        | 15% \r"
+sleep 0.1
+
+echo -ne "|##        | 20% \r"
+sleep 0.1
+
+echo -ne "|###       | 25% \r"
+sleep 0.1
+
+
+
+#### Lager en png med info
+convert -background white -fill black -size 600x200 -gravity South label:"'$skolenavn$adresse$poststed'" -border 60x68 -monochrome -rotate 90 /tmp/postlapp.png
+
+#### Mer progressbar
+echo -ne "|###       | 30% \r"
+sleep 0.1
+
+echo -ne "|####      | 35% \r"
+sleep 0.1
+
+echo -ne "|####      | 40% \r"
+sleep 0.1
+
+echo -ne "|#####     | 45% \r"
+sleep 0.1
+
+echo -ne "|#####     | 50% \r"
+sleep 0.1
+
+#### Sender png til utskrift
+cd /home/hhauk/ql570 
+./ql570 /dev/usb/lp0 62x29 /tmp/postlapp.png &> /dev/null
+
+#### Mer progressbar
+echo -ne "|######    | 55% \r"
+sleep 0.1
+
+echo -ne "|######    | 60% \r"
+sleep 0.1
+
+echo -ne "|#######   | 70% \r"
+sleep 0.1
+
+echo -ne "|########  | 75% \r"
+sleep 0.1
+
+echo -ne "|########  | 80% \r"
+sleep 0.1
+
+echo -ne "|######### | 90% \r"
+sleep 0.1
+
+echo -ne "|##########| 100%\n\n"
+echo "Postlapp skrevet ut!"

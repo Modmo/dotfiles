@@ -1,0 +1,13 @@
+#!/bin/bash
+
+link=$1
+link+='.json'
+
+curl --user-agent 'bobby' $link -o tmpfile
+
+videolink=$(grep -P -o '(https).*?(\d\d\d.mp4)' tmpfile | head -1)
+
+ffmpeg -i $videolink -hide_banner -loglevel error -y -c copy ~/Videos/videofromreddit.mp4 && echo "Video lastet ned"
+
+rm tmpfile
+

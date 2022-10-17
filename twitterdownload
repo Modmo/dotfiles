@@ -1,0 +1,2 @@
+#!/bin/bash
+yt-dlp $1 -P ~/Videos/ -o "twittervideo.mp4" && echo "Video lastet ned"
