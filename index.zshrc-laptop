@@ -1,0 +1,112 @@
+# Lines configured by zsh-newuser-install
+HISTFILE=~/.histfile
+HISTSIZE=1000
+SAVEHIST=1000
+bindkey -e
+
+#monitorfix i3
+#xrandr --output DP-1 --auto --right-of HDMI-2
+
+# End of lines configured by zsh-newuser-install
+# The following lines were added by compinstall
+zstyle :compinstall filename '/home/hhauk/.zshrc'
+
+autoload -Uz compinit
+compinit
+# End of lines added by compinstall
+#
+#Prompt
+PROMPT="%T %F{red}%m%f@%F{blue}%n%f %F{green}%~%f -> "
+
+alias ls='ls --color=auto'
+
+#prompt command
+
+setopt promptsubst
+
+##Rotate display
+bindkey -s '^[[[C' "echo 3 | sudo tee /sys/class/graphics/fbcon/rotate_all^M"
+bindkey -s '^[[[B' "echo 0 | sudo tee /sys/class/graphics/fbcon/rotate_all^M"
+
+
+##Battery and Backlight
+function precmd() {
+
+#Backlight
+brightness=$(cat /sys/class/backlight/intel_backlight/brightness)
+increase=$(($brightness + 300))
+decrease=$(($brightness - 300))
+bindkey -s '^[[17~' "echo $increase | sudo tee /sys/class/backlight/intel_backlight/brightness^M"
+bindkey -s '^[[[E' "echo $decrease | sudo tee /sys/class/backlight/intel_backlight/brightness^M"
+#Bdirs
+batterydir="/sys/class/power_supply/BAT1"
+batterydir0="/sys/class/power_supply/BAT0"
+#Hours
+batterywh=$(cat $batterydir/energy_now)
+batteryw=$(($(cat $batterydir/power_now) + $(cat $batterydir0/power_now)))
+#state
+batterystat=$(cat $batterydir/status)
+batterystat0=$(cat $batterydir0/status)
+#%
+battery1c=$(cat $batterydir/capacity)
+battery0c=$(cat $batterydir0/capacity)
+#AC
+charging=$(cat /sys/class/power_supply/AC/online)
+##Hours
+hoursleft=$(echo "scale=2 ; $batterywh / $batteryw" | bc) &> /dev/null
+
+
+#%
+percentleft=$(($(($battery1c + $battery0c)) / 2))
+
+if [[ $charging == 1 ]]
+	then
+		RPROMPT="Lader koblet til, %F{green}LADER%f $percentleft%% "
+elif (( $battery1c > 70 ))
+	then
+		RPROMPT="%F{green}$percentleft%f%% $batterystat  ca $hoursleft t igjen"
+elif (( $battery1c < 10 ))
+	then
+		RPROMPT="%F{yellow}$percentleft%f%% $batterystat0  ca $hoursleft t igjen"
+elif (( $battery0c < 30 ))
+	then
+		RPROMPT="%F{red}SNART TOM! $percentleft%%%f $batterystat0  ca $hoursleft t igjen"
+	fi
+}
+
+#set -o vi #denne ødelegger for FN key bindings
+#bindkey "^[[C" forward-word
+#bindkey "^[[D" backward-word
+
+export EDITOR='vim'
+export VISUAL='vim'
+
+##aliases
+
+#general
+alias logs='journalctl -xe'
+
+#work
+alias ude='sudo openconnect --authgroup=UDE-Intern -u hhauk vpn.ude.oslo.no'
+alias console='sudo screen /dev/ttyUSB0 9600'
+alias jump='sudo ssh hhauk@193.156.192.120'
+alias asdm='./Documents/work/asdm 193.156.192.133'
+
+#pacman
+alias upgrade='sudo pacman -Syyu'
+alias install='sudo pacman -S'
+alias remove='sudo pacman -Rns'
+
+alias edit='sudo vim'
+
+#weather & astronomy
+alias weather='curl http://wttr.in/Norway'
+alias mapweather='curl https://v3.wttr.in/Oslo.png | kitty icat --align=left'
+alias grafweather='curl http://v2.wttr.in/Norway'
+alias moonphase='curl http://wttr.in/moon'
+
+
+#highlighting
+#source /home/hhauk/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+#source /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+source /usr/share/zsh/plugins/fast-syntax-highlighting/fast-syntax-highlighting.plugin.zsh
