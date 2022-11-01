@@ -16,7 +16,7 @@ compinit
 # End of lines added by compinstall
 #
 #Prompt
-PROMPT="%T %F{red}%m%f@%F{blue}%n%f %F{green}%~%f -> "
+PROMPT="%T %F{blue}%n%f@%F{red}%m%f %F{green}%~%f -> "
 
 alias ls='ls --color=auto'
 
